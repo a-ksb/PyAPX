@@ -8,7 +8,7 @@ ENERGY_EVALUATOR = qe
 OPTIMIZER = physbo
 
 # settings for encoding
-ENCODE = NAmod
+ENCODE_TYPE = NAmod
 WEIGHT = 0.3
 
 # settings for physbo

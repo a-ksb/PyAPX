@@ -77,7 +77,7 @@ As an energy evaluator, you can also specify user-defined functions instead of D
 
 ```ini
 # settings for encoding
-ENCODE = NAmod    # encoding method: "OH", "NA" or "NAmod"
+ENCODE_TYPE = NAmod    # encoding method: "OH", "NA" or "NAmod"
 WEIGHT = 0.3    # parameter for "NA" and "NAmod"
 ```
 

@@ -7,7 +7,7 @@ ENERGY_EVALUATOR = custom:my_evaluator.run_ising_calculation
 OPTIMIZER = physbo
 
 # settings for encoding
-ENCODE = OH
+ENCODE_TYPE = OH
 
 # settings for physbo
 SCORE = EI
