@@ -1,0 +1,13 @@
+# PyAPX input file for h-BCN_3x3 with CHGNet
+
+ENCODING = True
+RANDOM_SAMPLING = 2
+BAYES_SAMPLING = 20
+ENERGY_EVALUATOR = custom:my_evaluator.run_chgnet_calculation
+OPTIMIZER = physbo
+
+# settings for encoding
+ENCODE_TYPE = OH
+
+# settings for physbo
+SCORE = EI
