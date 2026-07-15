@@ -4,7 +4,7 @@
 </div>
 
 [![arXiv](https://img.shields.io/badge/arXiv-2511.17972-b31b1b.svg)](http://arxiv.org/abs/2511.17972)
-[![DOI](https://zenodo.org/badge/1092716137.svg)](https://doi.org/10.5281/zenodo.21351586)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21351586-blue)](https://doi.org/10.5281/zenodo.21351586)
 
 # PyAPX - Python Toolkit for Atomic Configuration Pattern Exploration
 
