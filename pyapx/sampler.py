@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import physbo
 from .encoder import encode_options
+_rng = random.Random()
 
 def run_random_sampling(max_structure_id):
     """
@@ -21,7 +22,7 @@ def run_random_sampling(max_structure_id):
         int: Selected structure ID
     """
     # Random sampling
-    sampled_id = random.randint(0, max_structure_id)
+    sampled_id = _rng.randint(0, max_structure_id)
     
     return sampled_id
 
@@ -54,7 +55,7 @@ def run_physbo_sampling(current_sample_id):
 
     # Create policy with initial data
     policy = physbo.search.discrete.policy(test_X=X, initial_data=[calculated_ids, t_initial])
-    #policy.set_seed(current_sample_id)  # Use current_sample_id as random seed
+    policy.set_seed(_rng.randint(0, 2**31 - 1))
 
     # Perform Bayesian search using settings from apx.in
     if score == "TS":
