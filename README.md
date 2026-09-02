@@ -4,11 +4,12 @@
 </div>
 
 [![arXiv](https://img.shields.io/badge/arXiv-2511.17972-b31b1b.svg)](http://arxiv.org/abs/2511.17972)
+[![arXiv](https://img.shields.io/badge/arXiv-2609.00953-b31b1b.svg)](http://arxiv.org/abs/2609.00953)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21351586-blue)](https://doi.org/10.5281/zenodo.21351586)
 
 # PyAPX - Python Toolkit for Atomic Configuration Pattern Exploration
 
-A toolkit that integrates DFT codes with Bayesian optimization to explore stable atomic configurations in materials <sup>[1]</sup>.
+A toolkit that integrates DFT codes with Bayesian optimization to explore stable atomic configurations in materials <sup>[1,2]</sup>.
 
 ## Requirements
 
@@ -35,7 +36,7 @@ pip install -r requirements.txt
 
 ### Example Using an Ising Model (Instead of a DFT Code)
 
-For details about this material system, please refer to articles <sup>[2,3]</sup>.
+For details about this material system, please refer to articles <sup>[3,4]</sup>.
 
 ```bash
 cd PyAPX/examples/H_GaN0001_6x6
@@ -48,7 +49,7 @@ python visualize_results.py
 
 ### Example Using Quantum ESPRESSO
 
-For details about this material system, please refer to the article <sup>[4]</sup>.
+For details about this material system, please refer to the article <sup>[5]</sup>.
 
 ```bash
 cd PyAPX/examples/h-BCN_3x3
@@ -73,16 +74,17 @@ OPTIMIZER = physbo
 
 When ENCODING = True, `encoded_candidates.pkl` is generated, which is required for Bayesian sampling.
 Then, schedule the number of random sampling and Bayesian sampling iterations. At least two initial data points are required for Bayesian sampling.
-PyAPX (v1.0.0) currently supports only Quantum ESPRESSO as a DFT code.
+PyAPX currently supports only Quantum ESPRESSO as a DFT code.
 As an energy evaluator, you can also specify user-defined functions instead of DFT codes (see Quick Start example).
 
 ```ini
 # settings for encoding
-ENCODE_TYPE = NAmod    # encoding method: "OH", "NA" or "NAmod"
+ENCODE_TYPE = NAmod    # encoding method: "OH", "NA", "NAmod" or "WL"
 WEIGHT = 0.3    # parameter for "NA" and "NAmod"
+# WL_H = 2    # parameter for "WL" (number of refinement iterations, default 1)
 ```
 
-You can choose from the following encoding methods: one-hot (OH) encoding, neighbor-atom (NA) encoding, and modified neighbor-atom (NAmod) encoding. For details, please refer to the article <sup>[1]</sup>.
+You can choose from the following encoding methods: one-hot (OH) encoding, neighbor-atom (NA) encoding, modified neighbor-atom (NAmod) encoding, and Weisfeiler-Lehman (WL) encoding. For details, please refer to the articles <sup>[1,2]</sup>.
 
 ```ini
 # settings for physbo
@@ -93,7 +95,7 @@ NUM_RAND_BASIS = 3000    # the number of basis functions
 You can choose from the following acquisition functions: Thompson Sampling (TS), Expected Improvement (EI), and Probability of Improvement (PI). For details, please refer to the [PHYSBO documentation](https://issp-center-dev.github.io/PHYSBO/manual/master/en/index.html).
 
 ```ini
-# settings for "NA", "NAmod"
+# settings for "NA", "NAmod", "WL"
 NEIGHBOR_SITES
 10   12   18    # site_1's neighbors are site_10, site_12 and site_18
 10   11   16    # site_2's neighbors are site_10, site_11 and site_16
@@ -103,7 +105,7 @@ NEIGHBOR_SITES
       .
 ```
 
-When using NA or NAmod encoding, list the neighboring sites in order from site_1 to define the site network.
+When using NA, NAmod or WL encoding, list the neighboring sites in order from site_1 to define the site network.
 
 In `qe_template.in`, users need to include atomic coordinates in the [Quantum ESPRESSO input file](https://www.quantum-espresso.org/Doc/INPUT_PW.html) as follows:
 
@@ -163,14 +165,16 @@ Output files:
 
 ## References
 
-When publishing the results using PyAPX, we hope that you cite the following article <sup>[1]</sup>. Additionally, please follow the guidelines for [PHYSBO](https://github.com/issp-center-dev/PHYSBO?tab=readme-ov-file#license) and [Quantum ESPRESSO](https://www.quantum-espresso.org/quote/) to acknowledge their usage and cite the relevant references.
+When publishing the results using PyAPX, we hope that you cite the following article <sup>[1]</sup>. When using WL encoding, please also cite the article <sup>[2]</sup>. Additionally, please follow the guidelines for [PHYSBO](https://github.com/issp-center-dev/PHYSBO?tab=readme-ov-file#license) and [Quantum ESPRESSO](https://www.quantum-espresso.org/quote/) to acknowledge their usage and cite the relevant references.
 
 [1] A. Kusaba et al., "PyAPX: Python toolkit for atomic configuration pattern exploration", arXiv:2511.17972 [cond-mat.mtrl-sci].
 
-PyAPX originates from following our previous studies <sup>[2,3,4]</sup>.
+[2] A. Kusaba et al., "Weisfeiler-Lehman subtree encoding for Bayesian optimization of atomic configurations", arXiv:2609.00953 [cond-mat.mtrl-sci].
 
-[2] A. Kusaba et al., "Exploration of a large-scale reconstructed structure on GaN(0001) surface by Bayesian optimization", *Applied Physics Letters* **120**, 021602 (2022).
+PyAPX originates from following our previous studies <sup>[3,4,5]</sup>.
 
-[3] K. Kawka et al., "Augmentation of the Electron Counting Rule with Ising Model", *Journal of Applied Physics* **135**, 225302 (2024).
+[3] A. Kusaba et al., "Exploration of a large-scale reconstructed structure on GaN(0001) surface by Bayesian optimization", *Applied Physics Letters* **120**, 021602 (2022).
 
-[4] T. Hara et al., "Exploration of Stable Atomic Configurations in Graphene-like BCN Systems by Density Functional Theory and Bayesian Optimization", *Crystal Growth & Design* **25**, 6719-6726 (2025).
+[4] K. Kawka et al., "Augmentation of the Electron Counting Rule with Ising Model", *Journal of Applied Physics* **135**, 225302 (2024).
+
+[5] T. Hara et al., "Exploration of Stable Atomic Configurations in Graphene-like BCN Systems by Density Functional Theory and Bayesian Optimization", *Crystal Growth & Design* **25**, 6719-6726 (2025).
