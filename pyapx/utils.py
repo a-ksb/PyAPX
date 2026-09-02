@@ -247,18 +247,18 @@ def read_wl_setting():
     Read Weisfeiler-Lehman (WL) encoding setting from apx.in
 
     Returns:
-        int: Number of WL refinement iterations (WL_H card, default 2)
+        int: Number of WL refinement iterations (WL_H card, default 1)
     """
     try:
         wl_h_str = read_card_value("apx.in", "WL_H")
-        wl_h = int(wl_h_str) if wl_h_str else 2
+        wl_h = int(wl_h_str) if wl_h_str else 1
         if wl_h < 0:
-            apx_print("WL_H must be >= 0, falling back to default (2)")
-            return 2
+            apx_print("WL_H must be >= 0, falling back to default (1)")
+            return 1
         return wl_h
     except Exception as e:
         apx_print(f"Error reading WL setting: {e}")
-        return 2  # Default value
+        return 1  # Default value
 
 def read_encoding_setting():
     """

@@ -9,7 +9,7 @@ OPTIMIZER = physbo
 
 # settings for encoding
 ENCODE_TYPE = WL
-WL_H = 2
+WL_H = 1
 
 # settings for physbo
 SCORE = TS

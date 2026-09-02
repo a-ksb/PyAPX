@@ -85,7 +85,7 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
 
-def encode_options(encode="OH", weight=0, wl_h=2, use_dimension_reduction=False, reduction_method=None, reduction_params=None):
+def encode_options(encode="OH", weight=0, wl_h=1, use_dimension_reduction=False, reduction_method=None, reduction_params=None):
     """
     Perform feature encoding for atomic configurations
     
@@ -97,7 +97,7 @@ def encode_options(encode="OH", weight=0, wl_h=2, use_dimension_reduction=False,
       - 'WL': Weisfeiler-Lehman subtree encoding (concatenated per-level
         label histograms, L2-normalised). Requires the NEIGHBOR_SITES card.
     - weight (float, optional): Weight to use in (modified) neighbor atom encoding (default is 0).
-    - wl_h (int, optional): Number of WL label-refinement iterations for 'WL' encoding (default is 2).
+    - wl_h (int, optional): Number of WL label-refinement iterations for 'WL' encoding (default is 1).
     - use_dimension_reduction (bool): Whether to apply dimension reduction after encoding (default is False).
     - reduction_method (str): Method for dimension reduction ('PCA' or 'AUTOENCODER').
     - reduction_params (dict): Parameters for dimension reduction (default is None).
