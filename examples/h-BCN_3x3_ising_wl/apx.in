@@ -1,0 +1,37 @@
+# PyAPX input file
+# h-BCN (3x3) toy Ising example with Weisfeiler-Lehman (WL) encoding
+
+ENCODING = True
+RANDOM_SAMPLING = 5
+BAYES_SAMPLING = 45
+ENERGY_EVALUATOR = custom:my_evaluator.run_ising_calculation
+OPTIMIZER = physbo
+
+# settings for encoding
+ENCODE_TYPE = WL
+WL_H = 2
+
+# settings for physbo
+SCORE = TS
+NUM_RAND_BASIS = 3000
+
+# settings for "NA", "NAmod", "WL"
+NEIGHBOR_SITES
+2   6   14
+1   3   7
+2   4   16
+3   5   9
+4   6   18
+1   5   11
+2   8   12
+7   9   13
+4   8   10
+9   11   15
+6   10   12
+7   11   17
+8   14   18
+1   13   15
+10   14   16
+3   15   17
+12   16   18
+5   13   17

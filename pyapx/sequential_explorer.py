@@ -12,17 +12,21 @@ def run_encoding():
     Returns:
         bool: True if successful, False otherwise
     """
-    from .utils import apx_print, read_encode_type_setting, read_dimension_reduction_setting
-    
+    from .utils import apx_print, read_encode_type_setting, read_dimension_reduction_setting, read_wl_setting
+
     print("")
     apx_print("=== Executing ENCODING ===")
     
     # Read encoding and dimension reduction settings
     encode_type, weight = read_encode_type_setting()
+    wl_h = read_wl_setting()
     use_dimension_reduction, reduction_method, reduction_params = read_dimension_reduction_setting()
     
     apx_print(f"Encode type: {encode_type}")
-    apx_print(f"Weight: {weight}")
+    if encode_type == "WL":
+        apx_print(f"WL iterations (WL_H): {wl_h}")
+    else:
+        apx_print(f"Weight: {weight}")
     apx_print(f"Use dimension reduction: {use_dimension_reduction}")
     if use_dimension_reduction:
         apx_print(f"Reduction method: {reduction_method}")
@@ -38,10 +42,10 @@ def run_encoding():
         if os.path.exists(cache_file):
             os.remove(cache_file)
             apx_print(f"Removed existing cache file: {cache_file}")
-        
-        result = encode_options(encode=encode_type, weight=weight, 
-                             use_dimension_reduction=use_dimension_reduction, 
-                             reduction_method=reduction_method, 
+
+        result = encode_options(encode=encode_type, weight=weight, wl_h=wl_h,
+                             use_dimension_reduction=use_dimension_reduction,
+                             reduction_method=reduction_method,
                              reduction_params=reduction_params)
         
         return True

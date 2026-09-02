@@ -85,16 +85,19 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
 
-def encode_options(encode="OH", weight=0, use_dimension_reduction=False, reduction_method=None, reduction_params=None):
+def encode_options(encode="OH", weight=0, wl_h=2, use_dimension_reduction=False, reduction_method=None, reduction_params=None):
     """
     Perform feature encoding for atomic configurations
     
     Parameters:
-    - encode (str): Encoding method ('OH', 'NA', or 'NAmod').
+    - encode (str): Encoding method ('OH', 'NA', 'NAmod', or 'WL').
       - 'OH': One-hot encoding.
       - 'NA': Neighbor atom encoding.
       - 'NAmod': Modified neighbor atom encoding.
+      - 'WL': Weisfeiler-Lehman subtree encoding (concatenated per-level
+        label histograms, L2-normalised). Requires the NEIGHBOR_SITES card.
     - weight (float, optional): Weight to use in (modified) neighbor atom encoding (default is 0).
+    - wl_h (int, optional): Number of WL label-refinement iterations for 'WL' encoding (default is 2).
     - use_dimension_reduction (bool): Whether to apply dimension reduction after encoding (default is False).
     - reduction_method (str): Method for dimension reduction ('PCA' or 'AUTOENCODER').
     - reduction_params (dict): Parameters for dimension reduction (default is None).
@@ -130,7 +133,7 @@ def encode_options(encode="OH", weight=0, use_dimension_reduction=False, reducti
     num_atom_types = len(atom_types)
     
     # Define neighbor_sites only if needed
-    if encode in ["NA", "NAmod"]:
+    if encode in ["NA", "NAmod", "WL"]:
         neighbor_sites_data = read_card("apx.in", "NEIGHBOR_SITES")
         neighbor_sites = [list(map(int, line.split())) for line in neighbor_sites_data]
 
@@ -181,6 +184,65 @@ def encode_options(encode="OH", weight=0, use_dimension_reduction=False, reducti
                 phi_candidates_mod[i][(j + 1) * (num_atom_types + 1) - 1] = sigma
         print(f"(apx) Modified neighbor atom encoding completed.", flush=True)
         return phi_candidates_mod
+
+    def weisfeiler_lehman():
+        """Perform Weisfeiler-Lehman (WL) subtree encoding.
+
+        Initial labels are the atom species; each WL iteration replaces the
+        label of a site by a compressed label of (own label, sorted multiset
+        of neighbour labels). The feature vector is the concatenation of the
+        per-level label histograms (levels 0..wl_h), L2-normalised per row,
+        so that the linear kernel <phi_x, phi_y> equals the cosine-normalised
+        WL subtree kernel. The encoding is invariant under lattice symmetry
+        operations (translations, rotations, mirrors) because it only counts
+        labelled local patterns, not site indices.
+
+        Fully vectorised over candidates; complexity O(num_candidates *
+        num_sites * wl_h) label updates.
+        """
+        print(f"(apx) Performing Weisfeiler-Lehman encoding (h={wl_h})...", flush=True)
+        # Species -> integer initial labels
+        labels = np.empty((num_candidates, num_sites), dtype=np.int64)
+        for j, atom_type in enumerate(atom_types):
+            labels[x_candidates == atom_type] = j
+
+        # Neighbour index table (0-based); ragged lists padded with -1
+        max_deg = max(len(nb) for nb in neighbor_sites)
+        nbr_idx = np.full((num_sites, max_deg), -1, dtype=np.int64)
+        for j, nb in enumerate(neighbor_sites):
+            nbr_idx[j, :len(nb)] = np.asarray(nb, dtype=np.int64) - 1
+        pad_mask = nbr_idx < 0
+        nbr_safe = np.where(pad_mask, 0, nbr_idx)
+
+        blocks = []
+        labs = labels
+        n_labels = num_atom_types
+        for level in range(wl_h + 1):
+            # Per-candidate histogram of current labels
+            flat = np.arange(num_candidates, dtype=np.int64)[:, None] * n_labels + labs
+            hist = np.bincount(flat.ravel(), minlength=num_candidates * n_labels)
+            blocks.append(hist.reshape(num_candidates, n_labels).astype(float))
+            if level == wl_h:
+                break
+            # Label refinement: (own label, sorted neighbour labels) -> new label
+            nb_labs = labs[:, nbr_safe]                       # (n, num_sites, max_deg)
+            if pad_mask.any():
+                nb_labs = np.where(pad_mask[None, :, :], np.int64(-1), nb_labs)
+            nb_labs = np.sort(nb_labs, axis=2)
+            keys = np.concatenate([labs[..., None], nb_labs], axis=2)
+            keys = keys.reshape(num_candidates * num_sites, 1 + max_deg)
+            uniq, inv = np.unique(keys, axis=0, return_inverse=True)
+            labs = inv.reshape(num_candidates, num_sites)
+            n_labels = uniq.shape[0]
+
+        phi_candidates = np.concatenate(blocks, axis=1)
+        # L2 normalisation (linear kernel == cosine WL subtree kernel)
+        norms = np.sqrt((phi_candidates ** 2).sum(axis=1))
+        norms[norms == 0] = 1.0
+        phi_candidates /= norms[:, None]
+        print(f"(apx) WL encoding completed. Feature dimension: {phi_candidates.shape[1]} "
+              f"(levels: {[b.shape[1] for b in blocks]})", flush=True)
+        return phi_candidates
 
     def apply_dimension_reduction(features, method, params):
         """Apply dimension reduction to features."""
@@ -271,9 +333,11 @@ def encode_options(encode="OH", weight=0, use_dimension_reduction=False, reducti
         result = neighbor_atom()
     elif encode == "NAmod":
         result = modified_neighbor_atom()
+    elif encode == "WL":
+        result = weisfeiler_lehman()
     else:
-        raise ValueError("Invalid option. Choose 'OH', 'NA', or 'NAmod'.")
-    
+        raise ValueError("Invalid option. Choose 'OH', 'NA', 'NAmod', or 'WL'.")
+
     # Apply dimension reduction if requested
     if use_dimension_reduction and reduction_method and reduction_params:
         try:
