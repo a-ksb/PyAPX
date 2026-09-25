@@ -14,6 +14,7 @@ WL_H = 1
 # settings for physbo
 SCORE = TS
 NUM_RAND_BASIS = 3000
+PHYSBO_CENTERING = False
 
 # settings for "NA", "NAmod", "WL"
 NEIGHBOR_SITES

@@ -37,7 +37,7 @@ def run_physbo_sampling(current_sample_id):
         int: Selected structure ID
     """
     # Read PHYSBO settings from apx.in
-    from .utils import read_physbo_setting, load_encoded_data_from_cache
+    from .utils import read_physbo_setting, read_physbo_centering_setting, load_encoded_data_from_cache
     score, num_rand_basis = read_physbo_setting()
     
     # Load pre-encoded data from cache
@@ -45,8 +45,11 @@ def run_physbo_sampling(current_sample_id):
     if not success:
         return None
     
-    # Center the data for PHYSBO
-    X = physbo.misc.centering(X.astype(np.float32))
+    X = X.astype(np.float32)
+    if read_physbo_centering_setting():
+        # Column-wise standardization (z-score) of the feature matrix
+        X = physbo.misc.centering(X)
+    # else: pass the encoded features to PHYSBO as-is
 
     # Load initial data from samples.csv
     samples_df = pd.read_csv("samples.csv")

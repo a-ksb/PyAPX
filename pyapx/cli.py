@@ -24,6 +24,9 @@ def main():
     from .utils import read_optimizer
     optimizer = read_optimizer()
     apx_print(f"Optimizer: {optimizer}")
+    if optimizer.lower() == "physbo":
+        from .utils import read_physbo_centering_setting
+        apx_print(f"PHYSBO centering: {read_physbo_centering_setting()}")
     
     # Read encoding setting
     from .utils import read_encoding_setting

@@ -399,6 +399,30 @@ def read_physbo_setting():
         apx_print(f"Error reading PHYSBO settings: {e}")
         return "TS", 3000  # Default values
 
+def read_physbo_centering_setting():
+    """
+    Read PHYSBO_CENTERING card from apx.in
+
+    Returns:
+        bool: True (default) -> apply physbo.misc.centering to the feature matrix
+              before passing it to PHYSBO
+              False -> pass the encoded features to PHYSBO as-is
+    """
+    try:
+        value = read_card_value("apx.in", "PHYSBO_CENTERING")
+        if value is None:
+            return True  # Default: same behavior as previous versions
+        value = value.strip().lower()
+        if value in ("true", "1", "yes", "on"):
+            return True
+        if value in ("false", "0", "no", "off"):
+            return False
+        apx_print(f"PHYSBO_CENTERING value '{value}' is invalid, falling back to default (True)")
+        return True
+    except Exception as e:
+        apx_print(f"Error reading PHYSBO_CENTERING setting: {e}")
+        return True
+
 def read_optimizer():
     """
     Read optimizer settings from apx.in

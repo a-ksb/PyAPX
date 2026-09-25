@@ -90,6 +90,7 @@ You can choose from the following encoding methods: one-hot (OH) encoding, neigh
 # settings for physbo
 SCORE = TS    # acquisition function: "TS", "EI" or "PI"
 NUM_RAND_BASIS = 3000    # the number of basis functions
+# PHYSBO_CENTERING = False    # column-wise standardization (z-score) of the feature matrix (default True)
 ```
 
 You can choose from the following acquisition functions: Thompson Sampling (TS), Expected Improvement (EI), and Probability of Improvement (PI). For details, please refer to the [PHYSBO documentation](https://issp-center-dev.github.io/PHYSBO/manual/master/en/index.html).
